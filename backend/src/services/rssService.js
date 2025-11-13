@@ -4,6 +4,7 @@ import FeedSource from '../models/FeedSource.js';
 import { analyzeArticle } from './sentimentService.js';
 import { uploadImageToCloudinary, extractImageFromRSSItem } from '../utils/uploadImage.js';
 import { invalidateArticleCache } from './cacheService.js';
+import { scrapeArticleContent, sanitizeHTML } from './scraperService.js';
 
 const parser = new Parser({
   timeout: 10000,
@@ -81,8 +82,42 @@ export const parseFeed = async (feedSource) => {
           feedSource: feedSource._id,
         };
 
-        // Analyze sentiment and extract keywords
-        const analysis = analyzeArticle(articleData);
+        // Scrape full article content
+        console.log(`🔍 Scraping full content for: ${item.title?.substring(0, 50)}...`);
+        const scrapedContent = await scrapeArticleContent(item.link);
+
+        if (scrapedContent && scrapedContent.content) {
+          articleData.fullContent = sanitizeHTML(scrapedContent.content);
+          articleData.textContent = scrapedContent.textContent || '';
+          articleData.excerpt = scrapedContent.excerpt || articleData.description;
+          articleData.contentScraped = true;
+          articleData.scrapedAt = new Date();
+
+          // Add scraped images to the images array
+          if (scrapedContent.images && scrapedContent.images.length > 0) {
+            articleData.images = scrapedContent.images;
+
+            // If no image was found in RSS, use first scraped image
+            if (!imageUrl && scrapedContent.images[0]) {
+              articleData.image = await uploadImageToCloudinary(scrapedContent.images[0]);
+            }
+          }
+
+          // Use scraped byline if available
+          if (scrapedContent.byline && !articleData.author) {
+            articleData.author = scrapedContent.byline;
+          }
+        } else {
+          console.warn(`⚠️  Failed to scrape content for: ${item.link}`);
+        }
+
+        // Analyze sentiment and extract keywords using full content
+        const textForAnalysis = articleData.textContent || articleData.content || articleData.description;
+        const analysis = analyzeArticle({
+          title: articleData.title,
+          description: articleData.description,
+          content: textForAnalysis
+        });
         articleData.sentiment = analysis.sentiment;
         articleData.sentimentScore = analysis.sentimentScore;
         articleData.tags = analysis.tags;
@@ -92,7 +127,7 @@ export const parseFeed = async (feedSource) => {
         await article.save();
 
         results.articlesAdded++;
-        console.log(`✅ Added: ${article.title.substring(0, 60)}...`);
+        console.log(`✅ Added: ${article.title.substring(0, 60)}... [Content: ${articleData.contentScraped ? 'Scraped' : 'RSS only'}]`);
 
       } catch (itemError) {
         if (itemError.code === 11000) {

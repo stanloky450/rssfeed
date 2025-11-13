@@ -3,8 +3,14 @@ export interface Article {
   title: string;
   description: string;
   content?: string;
+  fullContent?: string;
+  textContent?: string;
+  excerpt?: string;
   link: string;
   image?: string;
+  images?: string[];
+  contentScraped?: boolean;
+  scrapedAt?: string;
   pubDate: string;
   source: string;
   sourceName: string;

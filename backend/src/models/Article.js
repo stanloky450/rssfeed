@@ -14,6 +14,18 @@ const articleSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  fullContent: {
+    type: String,
+    default: '',
+  },
+  textContent: {
+    type: String,
+    default: '',
+  },
+  excerpt: {
+    type: String,
+    default: '',
+  },
   link: {
     type: String,
     required: [true, 'Article link is required'],
@@ -21,6 +33,17 @@ const articleSchema = new mongoose.Schema({
   },
   image: {
     type: String,
+    default: null,
+  },
+  images: [{
+    type: String,
+  }],
+  contentScraped: {
+    type: Boolean,
+    default: false,
+  },
+  scrapedAt: {
+    type: Date,
     default: null,
   },
   pubDate: {

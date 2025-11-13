@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Article } from '@/types';
 import { formatRelativeTime, getSentimentColor, getSentimentBgColor } from '@/lib/utils';
-import { FiExternalLink, FiSmile, FiMeh, FiFrown } from 'react-icons/fi';
+import { FiExternalLink, FiSmile, FiMeh, FiFrown, FiFileText } from 'react-icons/fi';
 
 interface ArticleCardProps {
   article: Article;
@@ -23,18 +23,26 @@ export function ArticleCard({ article }: ArticleCardProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-      {article.image && (
-        <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700">
-          <Image
-            src={article.image}
-            alt={article.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
-      )}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group">
+      <Link href={`/article/${article._id}`}>
+        {article.image && (
+          <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <Image
+              src={article.image}
+              alt={article.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+            {article.contentScraped && (
+              <div className="absolute top-2 right-2 px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded-full shadow-lg flex items-center gap-1">
+                <FiFileText className="w-3 h-3" />
+                Full Article
+              </div>
+            )}
+          </div>
+        )}
+      </Link>
 
       <div className="p-5">
         {/* Header */}
@@ -51,9 +59,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-          {article.title}
-        </h3>
+        <Link href={`/article/${article._id}`}>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 hover:text-primary-600 dark:hover:text-primary-400 transition-colors cursor-pointer">
+            {article.title}
+          </h3>
+        </Link>
 
         {/* Description */}
         {article.description && (
@@ -87,15 +97,28 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </span>
           </div>
 
-          <a
-            href={article.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
-          >
-            Read More
-            <FiExternalLink className="w-4 h-4" />
-          </a>
+          <div className="flex items-center gap-2">
+            {/* View Full Article Button */}
+            <Link
+              href={`/article/${article._id}`}
+              className="flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+            >
+              {article.contentScraped ? 'Read Full Article' : 'Read More'}
+              <FiFileText className="w-4 h-4" />
+            </Link>
+
+            {/* External Link (secondary) */}
+            <a
+              href={article.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              title="View original source"
+            >
+              <FiExternalLink className="w-4 h-4" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
