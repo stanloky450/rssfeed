@@ -6,15 +6,20 @@ A modern, full-featured RSS Feed Aggregator with AI-powered sentiment analysis, 
 
 ### Backend
 - **RSS Parsing & Aggregation** - Fetch and parse multiple RSS feeds automatically
+- **Full Content Scraping** - Automatically extract complete article content from source URLs
 - **AI-Powered Analysis** - Sentiment analysis and keyword extraction using NLP
 - **Redis Caching** - Fast response times with intelligent caching
 - **Image Optimization** - Cloudinary integration for optimized image delivery
+- **Multi-Image Support** - Extract and store all images from articles
+- **Content Sanitization** - Safe HTML rendering with XSS protection
 - **Admin API** - Comprehensive REST API for feed management
 - **Automated Refresh** - Scheduled RSS feed updates with node-cron
 - **MongoDB Storage** - Efficient data storage with Mongoose ODM
 
 ### Frontend
 - **Next.js 14** - Modern React framework with App Router
+- **Internal Article Viewer** - Read full articles without leaving the site
+- **Rich Content Display** - Beautiful typography and image galleries
 - **Dark Mode** - Beautiful dark/light theme switching
 - **Infinite Scrolling** - Seamless content loading as you scroll
 - **Advanced Filtering** - Filter by topic, sentiment, search keywords
@@ -29,6 +34,7 @@ A modern, full-featured RSS Feed Aggregator with AI-powered sentiment analysis, 
 - MongoDB + Mongoose
 - Redis for caching
 - RSS Parser
+- Web scraping with Mozilla Readability, Cheerio, and JSDOM
 - Sentiment analysis with `sentiment` library
 - Natural language processing with `natural`
 - Cloudinary for image handling
